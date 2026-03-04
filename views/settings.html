@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>PFIS — Settings</title>
+  <link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-title">🛡 PFIS</div>
+    <div class="brand-sub">Predictive Fraud Intelligence</div>
+  </div>
+  <div class="sidebar-nav">
+    <a href="/"               class="sidebar-link "><span class="icon">📊</span> Dashboard</a>
+    <a href="/monitor"        class="sidebar-link "><span class="icon">📡</span> Live Monitor</a>
+    <a href="/transactions"   class="sidebar-link "><span class="icon">📋</span> Transactions</a>
+    <a href="/profiles"       class="sidebar-link "><span class="icon">👤</span> User Profiles</a>
+    <a href="/investigations" class="sidebar-link "><span class="icon">🔍</span> Investigations</a>
+    <a href="/reports"        class="sidebar-link "><span class="icon">📈</span> Reports</a>
+    <a href="/settings"       class="sidebar-link active"><span class="icon">⚙</span> Settings</a>
+  </div>
+  <div class="engine-bar">
+    <div class="status-row">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Engine Offline</span>
+    </div>
+    <button class="btn btn-primary btn-sm" id="engineBtn" onclick="toggleEngine()" style="width:100%;">▶ Activate Engine</button>
+  </div>
+</nav>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Settings</div>
+    <div id="dashTime" style="font-size:12px;color:var(--gov-muted);text-align:right;"></div>
+  </div>
+  <div class="page-content">
+
+<div class="grid-2">
+  <div>
+    <div class="card mb-16" id="settings-risk">
+      <div class="card-header"><h3>Risk Thresholds</h3></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:14px;">
+        <label style="font-size:13px;font-weight:600;">Safe threshold (score ≤)
+          <input type="number" id="thresh-safe" min="0" max="99" value="40" style="width:100%;margin-top:4px;"/>
+        </label>
+        <label style="font-size:13px;font-weight:600;">Moderate threshold (score ≤)
+          <input type="number" id="thresh-mod" min="1" max="100" value="70" style="width:100%;margin-top:4px;"/>
+        </label>
+        <label style="font-size:13px;font-weight:600;">Engine interval (seconds)
+          <input type="number" id="txnInterval" min="0.5" max="30" step="0.5" value="2.8" style="width:100%;margin-top:4px;"/>
+        </label>
+        <button class="btn btn-primary" onclick="saveThresholds()">💾 Save Configuration</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3>About PFIS</h3></div>
+    <div class="card-body" style="font-size:13px;line-height:1.7;color:var(--gov-muted);">
+      <p>Predictive Fraud Intelligence System v1.0</p>
+      <p style="margin-top:8px;">Monitors mobile money transactions in real-time across 6 user profiles using a weighted rule-based engine with 6 detection hurdles.</p>
+      <p style="margin-top:8px;">Transactions are scored 0–100 and classified as Safe, Moderate, or High Risk based on configurable thresholds.</p>
+    </div>
+  </div>
+</div>
+
+  </div>
+</div>
+<script src="/pfis.js"></script>
+</body>
+</html>

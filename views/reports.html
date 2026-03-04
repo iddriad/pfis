@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>PFIS — Reports</title>
+  <link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-title">🛡 PFIS</div>
+    <div class="brand-sub">Predictive Fraud Intelligence</div>
+  </div>
+  <div class="sidebar-nav">
+    <a href="/"               class="sidebar-link "><span class="icon">📊</span> Dashboard</a>
+    <a href="/monitor"        class="sidebar-link "><span class="icon">📡</span> Live Monitor</a>
+    <a href="/transactions"   class="sidebar-link "><span class="icon">📋</span> Transactions</a>
+    <a href="/profiles"       class="sidebar-link "><span class="icon">👤</span> User Profiles</a>
+    <a href="/investigations" class="sidebar-link "><span class="icon">🔍</span> Investigations</a>
+    <a href="/reports"        class="sidebar-link active"><span class="icon">📈</span> Reports</a>
+    <a href="/settings"       class="sidebar-link "><span class="icon">⚙</span> Settings</a>
+  </div>
+  <div class="engine-bar">
+    <div class="status-row">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Engine Offline</span>
+    </div>
+    <button class="btn btn-primary btn-sm" id="engineBtn" onclick="toggleEngine()" style="width:100%;">▶ Activate Engine</button>
+  </div>
+</nav>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Reports</div>
+    <div id="dashTime" style="font-size:12px;color:var(--gov-muted);text-align:right;"></div>
+  </div>
+  <div class="page-content">
+
+<div class="stats-grid mb-16">
+  <div class="stat-card"><div class="stat-label">Total Transactions</div><div class="stat-value" id="rpt-total">—</div></div>
+  <div class="stat-card"><div class="stat-label">Detection Rate</div><div class="stat-value" id="rpt-rate">—</div></div>
+  <div class="stat-card"><div class="stat-label">Fraud Prevented</div><div class="stat-value" id="rpt-saved" style="font-size:18px;">—</div></div>
+</div>
+<div class="grid-2 mb-16">
+  <div class="card">
+    <div class="card-header"><h3>Rule Failure Frequency</h3></div>
+    <div class="card-body" id="hurdleStats"><div class="text-muted text-small">No data.</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3>Risk by Customer Segment</h3></div>
+    <div class="card-body" id="riskBySegment"><div class="text-muted text-small">No data.</div></div>
+  </div>
+</div>
+<div class="card mb-16">
+  <div class="card-header"><h3>Fraud Type Breakdown</h3></div>
+  <div class="card-body" id="fraudTypeBreakdown"><div class="text-muted text-small">No data.</div></div>
+</div>
+<button class="btn btn-primary" onclick="generateReport()">🔄 Refresh from Live Data</button>
+
+  </div>
+</div>
+<script src="/pfis.js"></script>
+</body>
+</html>

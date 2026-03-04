@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>PFIS — Live Monitor</title>
+  <link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-title">🛡 PFIS</div>
+    <div class="brand-sub">Predictive Fraud Intelligence</div>
+  </div>
+  <div class="sidebar-nav">
+    <a href="/"               class="sidebar-link"><span class="icon">📊</span> Dashboard</a>
+    <a href="/monitor"        class="sidebar-link active"><span class="icon">📡</span> Live Monitor</a>
+    <a href="/transactions"   class="sidebar-link"><span class="icon">📋</span> Transactions</a>
+    <a href="/profiles"       class="sidebar-link"><span class="icon">👤</span> User Profiles</a>
+    <a href="/investigations" class="sidebar-link"><span class="icon">🔍</span> Investigations</a>
+    <a href="/reports"        class="sidebar-link"><span class="icon">📈</span> Reports</a>
+    <a href="/settings"       class="sidebar-link"><span class="icon">⚙</span> Settings</a>
+  </div>
+  <div class="engine-bar">
+    <div class="status-row">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Engine Offline</span>
+    </div>
+    <button class="btn btn-primary btn-sm" id="engineBtn" onclick="toggleEngine()" style="width:100%;">▶ Activate Engine</button>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Live Monitor</div>
+    <div id="dashTime" style="font-size:12px;color:var(--gov-muted);text-align:right;"></div>
+  </div>
+  <div class="page-content">
+
+    <!-- Counts -->
+    <div style="display:flex;gap:12px;margin-bottom:16px;">
+      <div class="stat-card" style="flex:1;"><div class="stat-label">Safe</div><div class="stat-value" id="monC-safe" style="color:var(--safe-green);">0</div></div>
+      <div class="stat-card" style="flex:1;"><div class="stat-label">Moderate</div><div class="stat-value" id="monC-mod" style="color:var(--warn-amber);">0</div></div>
+      <div class="stat-card" style="flex:1;"><div class="stat-label">High Risk</div><div class="stat-value" id="monC-high" style="color:var(--danger-red);">0</div></div>
+      <div class="stat-card" style="flex:1;"><div class="stat-label">Awaiting SMS</div><div class="stat-value" id="monC-sms" style="color:#553C9A;">0</div></div>
+    </div>
+
+    <!-- SMS Pending Panel -->
+    <div id="smsPendingPanel" style="display:none;margin-bottom:16px;">
+      <div class="card">
+        <div class="card-header" style="background:#F5F3FF;border-color:#C4B5FD;">
+          <h3 style="color:#553C9A;">📱 Awaiting Customer SMS Confirmation</h3>
+          <span class="text-muted text-small">Auto-blocks on timeout</span>
+        </div>
+        <div class="card-body" id="smsPendingList"></div>
+      </div>
+    </div>
+
+    <!-- SMS Mode Banner -->
+    <div id="smsModeBanner" style="background:#EDE9FE;border:1px solid #C4B5FD;border-radius:4px;padding:10px 16px;margin-bottom:14px;font-size:12px;color:#553C9A;display:none;">
+      📱 <strong>SMS Confirmation Mode Active</strong> — High-risk transactions trigger customer SMS alerts.
+      <span id="smsConfigNote"></span>
+    </div>
+
+    <!-- Filters -->
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+      <span style="font-size:12px;font-weight:700;align-self:center;">Filter:</span>
+      <button class="btn btn-outline btn-sm sidebar-link active" onclick="setMonFilter('all',this)">All</button>
+      <button class="btn btn-outline btn-sm sidebar-link" onclick="setMonFilter('safe',this)">Safe</button>
+      <button class="btn btn-outline btn-sm sidebar-link" onclick="setMonFilter('moderate',this)">Moderate</button>
+      <button class="btn btn-outline btn-sm sidebar-link" onclick="setMonFilter('high',this)">High Risk</button>
+      <button class="btn btn-outline btn-sm sidebar-link" onclick="setMonFilter('awaiting',this)">Awaiting SMS</button>
+      <button class="btn btn-outline btn-sm" style="margin-left:auto;" onclick="clearMonitor()">Clear Feed</button>
+    </div>
+
+    <div id="monitorFeed">
+      <div style="color:var(--gov-muted);font-size:13px;">Activate the engine to see live transactions.</div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/pfis.js"></script>
+<script>
+// ── SMS pending countdown panel ──────────────────────────────────────────────
+function updateSmsPendingPanel() {
+  fetch('/api/sms/pending').then(r => r.json()).then(pending => {
+    const panel = document.getElementById('smsPendingPanel');
+    const list  = document.getElementById('smsPendingList');
+    const count = document.getElementById('monC-sms');
+    count.textContent = pending.length;
+
+    if (!pending.length) { panel.style.display = 'none'; return; }
+    panel.style.display = 'block';
+
+    list.innerHTML = pending.map(p => {
+      const pct = Math.round((p.secondsLeft / 120) * 100);
+      const col = p.secondsLeft > 60 ? 'var(--safe-green)' : p.secondsLeft > 20 ? 'var(--warn-amber)' : 'var(--danger-red)';
+      const txn = (window._transactions || []).find(t => t.id === p.txnId);
+      const name = txn?.profile?.name || '—';
+      const amt  = txn ? '₵' + Number(txn.amount).toLocaleString('en-GH',{minimumFractionDigits:2}) : '—';
+      return `
+        <div style="display:flex;align-items:center;gap:16px;padding:10px 0;border-bottom:1px solid #F3F4F6;">
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:13px;">${name} — ${amt}</div>
+            <div style="font-size:11px;color:var(--gov-muted);font-family:monospace;">${p.txnId}</div>
+            <div style="font-size:11px;color:var(--gov-muted);">SMS → ${p.phone} ${p.smsSent ? '✅ sent' : '(simulation)'}</div>
+          </div>
+          <div style="min-width:140px;">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;">
+              <span style="color:${col};font-weight:700;">⏱ ${p.secondsLeft}s remaining</span>
+            </div>
+            <div style="background:#E2E8F0;border-radius:2px;height:8px;">
+              <div style="width:${pct}%;height:100%;background:${col};border-radius:2px;transition:width 1s;"></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0;">
+            <button class="btn btn-success btn-sm" onclick="simulateSmsReply('${p.txnId}','YES')">Sim YES</button>
+            <button class="btn btn-danger  btn-sm" onclick="simulateSmsReply('${p.txnId}','NO')">Sim NO</button>
+          </div>
+        </div>`;
+    }).join('');
+  }).catch(() => {});
+}
+
+function simulateSmsReply(txnId, reply) {
+  fetch('/api/sms/simulate', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ txnId, reply })
+  }).then(r => r.json()).then(res => {
+    addLog(`📱 Simulated SMS reply for <strong>${txnId}</strong>: <strong>${reply}</strong> → ${res.matched ? (res.confirmed ? 'Approved' : 'Cancelled') : 'Not matched'}`);
+    updateSmsPendingPanel();
+  });
+}
+
+// Check SMS config status
+fetch('/api/sms/status').then(r => r.json()).then(s => {
+  const banner = document.getElementById('smsModeBanner');
+  const note   = document.getElementById('smsConfigNote');
+  banner.style.display = 'block';
+  note.textContent = s.configured
+    ? ' Real SMS enabled (Africa\'s Talking).'
+    : ' Running in simulation mode — use "Sim YES/NO" buttons to test.';
+}).catch(() => {});
+
+// Poll pending every second for countdown accuracy
+setInterval(updateSmsPendingPanel, 1000);
+
+// Expose transactions to window for the panel
+const _origRender = window.renderMonitorPage;
+window.renderMonitorPage = function(data) {
+  window._transactions = data;
+  _origRender && _origRender(data);
+  updateSmsPendingPanel();
+};
+</script>
+</body>
+</html>

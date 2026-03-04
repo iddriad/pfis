@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>PFIS — User Profiles</title>
+  <link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-title">🛡 PFIS</div>
+    <div class="brand-sub">Predictive Fraud Intelligence</div>
+  </div>
+  <div class="sidebar-nav">
+    <a href="/"               class="sidebar-link "><span class="icon">📊</span> Dashboard</a>
+    <a href="/monitor"        class="sidebar-link "><span class="icon">📡</span> Live Monitor</a>
+    <a href="/transactions"   class="sidebar-link "><span class="icon">📋</span> Transactions</a>
+    <a href="/profiles"       class="sidebar-link active"><span class="icon">👤</span> User Profiles</a>
+    <a href="/investigations" class="sidebar-link "><span class="icon">🔍</span> Investigations</a>
+    <a href="/reports"        class="sidebar-link "><span class="icon">📈</span> Reports</a>
+    <a href="/settings"       class="sidebar-link "><span class="icon">⚙</span> Settings</a>
+  </div>
+  <div class="engine-bar">
+    <div class="status-row">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Engine Offline</span>
+    </div>
+    <button class="btn btn-primary btn-sm" id="engineBtn" onclick="toggleEngine()" style="width:100%;">▶ Activate Engine</button>
+  </div>
+</nav>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">User Profiles</div>
+    <div id="dashTime" style="font-size:12px;color:var(--gov-muted);text-align:right;"></div>
+  </div>
+  <div class="page-content">
+
+<div id="profileContainer" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+  <div class="text-muted">Loading profiles…</div>
+</div>
+
+  </div>
+</div>
+<script src="/pfis.js"></script>
+</body>
+</html>

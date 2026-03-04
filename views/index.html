@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>PFIS — Dashboard</title>
+  <link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-title">🛡 PFIS</div>
+    <div class="brand-sub">Predictive Fraud Intelligence</div>
+  </div>
+  <div class="sidebar-nav">
+    <a href="/"               class="sidebar-link active"><span class="icon">📊</span> Dashboard</a>
+    <a href="/monitor"        class="sidebar-link "><span class="icon">📡</span> Live Monitor</a>
+    <a href="/transactions"   class="sidebar-link "><span class="icon">📋</span> Transactions</a>
+    <a href="/profiles"       class="sidebar-link "><span class="icon">👤</span> User Profiles</a>
+    <a href="/investigations" class="sidebar-link "><span class="icon">🔍</span> Investigations</a>
+    <a href="/reports"        class="sidebar-link "><span class="icon">📈</span> Reports</a>
+    <a href="/settings"       class="sidebar-link "><span class="icon">⚙</span> Settings</a>
+  </div>
+  <div class="engine-bar">
+    <div class="status-row">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Engine Offline</span>
+    </div>
+    <button class="btn btn-primary btn-sm" id="engineBtn" onclick="toggleEngine()" style="width:100%;">▶ Activate Engine</button>
+  </div>
+</nav>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Dashboard</div>
+    <div id="dashTime" style="font-size:12px;color:var(--gov-muted);text-align:right;"></div>
+  </div>
+  <div class="page-content">
+
+<div id="engineNotice" style="background:#FEF3C7;border:1px solid #F59E0B;border-radius:4px;padding:12px 16px;margin-bottom:18px;font-size:13px;">
+  ⚠ Engine is offline. Click <strong>Activate Engine</strong> in the sidebar to begin monitoring.
+</div>
+<div class="stats-grid">
+  <div class="stat-card"><div class="stat-label">Total Transactions</div><div class="stat-value" id="st-total">0</div></div>
+  <div class="stat-card"><div class="stat-label">Safe</div><div class="stat-value" id="st-safe" style="color:var(--safe-green);">0</div></div>
+  <div class="stat-card"><div class="stat-label">Moderate</div><div class="stat-value" id="st-mod" style="color:var(--warn-amber);">0</div></div>
+  <div class="stat-card"><div class="stat-label">High Risk</div><div class="stat-value" id="st-high" style="color:var(--danger-red);">0</div></div>
+  <div class="stat-card"><div class="stat-label">Fraud Prevented</div><div class="stat-value" id="st-saved" style="font-size:18px;">₵0.00</div></div>
+  <div class="stat-card"><div class="stat-label">Safe Rate</div><div class="stat-value" id="st-rate">—</div></div>
+</div>
+
+<div class="grid-2 mb-16">
+  <div class="card">
+    <div class="card-header"><h3>Risk Distribution</h3><span class="text-muted text-small" id="distMeta"></span></div>
+    <div class="card-body" id="distBars" style="display:flex;flex-direction:column;gap:12px;">
+      <div class="text-muted text-small">No data yet.</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3>Risk by User Type</h3></div>
+    <div class="card-body" id="userTypeChart"><div class="text-muted text-small">No data yet.</div></div>
+  </div>
+</div>
+
+<div class="card mb-16">
+  <div class="card-header"><h3>Risk Score Trend (last 20)</h3></div>
+  <div class="card-body" style="padding:12px 16px;">
+    <svg id="trendSvg" width="100%" height="90"></svg>
+  </div>
+</div>
+
+<div class="card mb-16">
+  <div class="card-header"><h3>High-Risk Transactions</h3></div>
+  <div class="table-wrap">
+    <table class="gov-table">
+      <thead><tr>
+        <th>Ref</th><th>Customer</th><th>Amount</th><th>Score</th>
+        <th>Failed Rules</th><th>Time</th><th>Status</th><th>Action</th>
+      </tr></thead>
+      <tbody id="dashHighBody">
+        <tr><td colspan="8" style="text-align:center;color:var(--gov-muted);padding:28px;">No high-risk transactions detected.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><h3>Activity Log</h3></div>
+  <div class="card-body" style="max-height:220px;overflow-y:auto;">
+    <table class="log-table"><tbody id="activityLog"></tbody></table>
+  </div>
+</div>
+
+  </div>
+</div>
+<script src="/pfis.js"></script>
+</body>
+</html>
